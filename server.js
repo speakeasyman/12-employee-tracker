@@ -134,6 +134,11 @@ const connection = mysql.createConnection({
                 });
             }else if (answers.action === 'VIEW_EMPLOYEES_BY_DEPARTMENT') {
                 console.log(`you want to see Employees by department`);
+                let deptQuery = 'SELECT * FROM departments'
+                connection.query(deptQuery, (err, resD) => {
+                    if (err) throw err;
+                    console.table(resD)
+                });
                 inquirer.
                 prompt({
                     name: 'department',
@@ -190,7 +195,70 @@ const connection = mysql.createConnection({
                             connection.end();
                         });
                     })
-                    } 
+                    } else if (answers.action === 'ADD_EMPLOYEE') {
+                        console.log(`you want to add an Employees`);                        
+          
+                        inquirer.
+                        prompt([
+                            {
+                            name: 'first_name',
+                            type: 'input',
+                            message: "Please enter The Employee's first name",
+                        }, {
+                            name: 'last_name',
+                            type: 'input',
+                            message: "Please enter The Employee's first name",
+                        }, {
+                            name: 'role_id',
+                            type: 'input',
+                            message: "Please enter The Employee's Role ID",
+                        }, {
+                            name: 'manager_id',
+                            type: 'input',
+                            message: "Please enter The Employee's Manager ID. If the employee is a manager, enter 0",
+                        }
+                    ])
+                        .then((answers) => {
+                            console.log(`we have reached the end`)
+                            
+                            let query = 
+                            'INSERT INTO employees (first_name, last_name, role_id, manager_id) '
+                            query +=
+                             'VALUES (?, ?, ?, ?) ';                            
+                            console.log('query:', query)
+                            connection.query(query, [answers.first_name, answers.last_name, answers.role_id, answers.manager_id], (err, res) => {
+                                console.log('query:', query)
+                                if (err) throw err;
+                                console.table(res);
+                                connection.end();
+                            });
+                        })
+                        } else if (answers.action === 'REMOVE_EMPLOYEE') {
+                            console.log(`you want to remove an Employees`);                        
+              
+                            inquirer.
+                            prompt([
+                                {
+                                name: 'id',
+                                type: 'input',
+                                message: "Please enter the employees ID number",
+                            },
+                        ])
+                            .then((answers) => {
+                                console.log(`we have reached the end`)
+                                
+                                let query = 
+                                'DELETE FROM employees WHERE employees.id = ?'                                                            
+                                console.log('query:', query)
+                                connection.query(query, [answers.id], (err, res) => {
+                                    console.log('query:', query)
+                                    if (err) throw err;
+                                    console.table(res);
+                                    connection.end();
+                                });
+                            })
+                            }
+
 })
 }
 
