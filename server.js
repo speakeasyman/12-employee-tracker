@@ -20,6 +20,7 @@ const connection = mysql.createConnection({
   connection.connect((err) => {
     if (err) throw err;
     start();
+    // generateManagers();
 });
 
   exports.connection = connection
@@ -136,23 +137,9 @@ const connection = mysql.createConnection({
                 inquirer.
                 prompt({
                     name: 'department',
-                    type: 'list',
-                    choices: [{
-                        name: 'Human Resources',
-                        value: '1'
-                    },
-                    {
-                        name: 'Quality Control',
-                        value: '2'
-                    },
-                    {
-                        name: 'Quality Engineering',
-                        value: '3'
-                    },
-                    {
-                        name: 'Research and Developement',
-                        value: '4'
-                    }]
+                    type: 'input',
+                    message: 'enter the department ID number',
+                    
                 })
                 .then((answers) => {
                     console.log(`we have reached the end`)
@@ -171,9 +158,61 @@ const connection = mysql.createConnection({
                         connection.end();
                     });
                 })
-                }
+                } else if (answers.action === 'VIEW_EMPLOYEES_BY_MANAGER') {
+                    console.log(`you want to see Employees by Manager`);
+                    let managerQuery = 'SELECT CONCAT(employees.first_name, " ", employees.last_name) AS Name, employees.id AS Manager from employees WHERE manager_id = 0'
+                    connection.query(managerQuery, (err, resM) => {
+                        if (err) throw err;
+                        console.table(resM)
+                    });
+      
+                    inquirer.
+                    prompt({
+                        name: 'manager',
+                        type: 'input',
+                        message: 'Please enter Manager ID',                       
+                         
+                    })
+                    .then((answers) => {
+                        console.log(`we have reached the end`)
+                        console.log(answers.manager)
+                        let query = 
+                        'SELECT e.id, e.first_name, e.last_name, roles.title, departments.name, roles.salary, CONCAT(m.first_name, " ", m.last_name) '
+                        query +=
+                         'AS manager FROM employees e LEFT JOIN employees m ON m.id = e.manager_id JOIN roles ON e.role_id = roles.id JOIN departments ON departments.id = roles.department_id ';
+                        query +=
+                        'WHERE e.manager_id = ?;';
+                        console.log('query:', query)
+                        connection.query(query, [answers.manager, answers.manager], (err, res) => {
+                            console.log('query:', query)
+                            if (err) throw err;
+                            console.table(res);
+                            connection.end();
+                        });
+                    })
+                    } 
 })
 }
 
 
-  
+//   generateManagers = () => {
+//       let query = 'SELECT CONCAT(employees.first_name, " ", employees.last_name) AS Name, employees.id AS Manager from employees WHERE manager_id = 0'
+//       connection.query(query,(err, res) => {
+//         console.log('query:', query)
+//         if (err) throw err;
+//       console.log(res[0].Manager)
+//       console.log(res[0].Name)
+//       const choices = res.map(function (obj){
+//           `{
+//               name: ${obj.Name},
+//               value: ${obj.Manager}
+//           }`
+
+//         })
+//         console.log(`here's choices!! ${choices}`)
+        
+        
+        
+//         connection.end();
+//     });
+//   }
