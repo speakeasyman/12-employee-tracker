@@ -1,6 +1,7 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
+const prompts = require('./assets/prompts')
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -17,7 +18,7 @@ const connection = mysql.createConnection({
   });
 
   const start = () => {
-      console.log(`server connected`)
+      prompts.startPrompt();
   };
 
   connection.connect((err) => {
