@@ -102,17 +102,25 @@ const connection = mysql.createConnection({
               console.log(`you want to see all employees`);
               connection.query('SELECT * FROM employees', (err, res) => {
                   if (err) throw err;
-                  console.log(res);
+                  console.table(res);
                   connection.end();
               });
-              
-
-
-
-              
-          }
-
-      })
+        }   else if (answers.action === 'VIEW_ROLES') {
+            console.log(`you want to see all Roles`);
+            connection.query('SELECT * FROM roles', (err, res) => {
+                if (err) throw err;
+                console.table(res);
+                connection.end();
+            });
+        }   else if (answers.action === 'VIEW_DEPARTMENTS') {
+                console.log(`you want to see all Departments`);
+                connection.query('SELECT * FROM departments', (err, res) => {
+                    if (err) throw err;
+                    console.table(res);
+                    connection.end();
+                });
+  }
+})
 }
 
   
