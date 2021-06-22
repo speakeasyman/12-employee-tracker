@@ -132,7 +132,7 @@ const connection = mysql.createConnection({
                     console.table(res);
                     connection.end();
                 });
-            }else if (answers.action === 'VIEW_EMPLOYEES_BY_DEPARTMENT') {
+        }   else if (answers.action === 'VIEW_EMPLOYEES_BY_DEPARTMENT') {
                 console.log(`you want to see Employees by department`);
                 let deptQuery = 'SELECT * FROM departments'
                 connection.query(deptQuery, (err, resD) => {
@@ -163,209 +163,271 @@ const connection = mysql.createConnection({
                         connection.end();
                     });
                 })
-                } else if (answers.action === 'VIEW_EMPLOYEES_BY_MANAGER') {
-                    console.log(`you want to see Employees by Manager`);
-                    let managerQuery = 'SELECT CONCAT(employees.first_name, " ", employees.last_name) AS Name, employees.id AS Manager from employees WHERE manager_id = 0'
-                    connection.query(managerQuery, (err, resM) => {
+        }   else if (answers.action === 'VIEW_EMPLOYEES_BY_MANAGER') {
+            console.log(`you want to see Employees by Manager`);
+            let managerQuery = 'SELECT CONCAT(employees.first_name, " ", employees.last_name) AS Name, employees.id AS Manager from employees WHERE manager_id = 0'
+            connection.query(managerQuery, (err, resM) => {
+                if (err) throw err;
+                console.table(resM)
+            });
+
+            inquirer.
+            prompt({
+                name: 'manager',
+                type: 'input',
+                message: 'Please enter Manager ID',                       
+                    
+            })
+            .then((answers) => {
+                console.log(`we have reached the end`)
+                console.log(answers.manager)
+                let query = 
+                'SELECT e.id, e.first_name, e.last_name, roles.title, departments.name, roles.salary, CONCAT(m.first_name, " ", m.last_name) '
+                query +=
+                    'AS manager FROM employees e LEFT JOIN employees m ON m.id = e.manager_id JOIN roles ON e.role_id = roles.id JOIN departments ON departments.id = roles.department_id ';
+                query +=
+                'WHERE e.manager_id = ?;';
+                console.log('query:', query)
+                connection.query(query, [answers.manager, answers.manager], (err, res) => {
+                    console.log('query:', query)
+                    if (err) throw err;
+                    console.table(res);
+                    connection.end();
+                });
+            })
+        }   else if (answers.action === 'ADD_EMPLOYEE') {
+            console.log(`you want to add an Employees`);                        
+
+            inquirer.
+            prompt([
+                {
+                name: 'first_name',
+                type: 'input',
+                message: "Please enter The Employee's first name",
+            }, {
+                name: 'last_name',
+                type: 'input',
+                message: "Please enter The Employee's first name",
+            }, {
+                name: 'role_id',
+                type: 'input',
+                message: "Please enter The Employee's Role ID",
+            }, {
+                name: 'manager_id',
+                type: 'input',
+                message: "Please enter The Employee's Manager ID. If the employee is a manager, enter 0",
+            }
+        ])
+            .then((answers) => {
+                console.log(`we have reached the end`)
+                
+                let query = 
+                'INSERT INTO employees (first_name, last_name, role_id, manager_id) '
+                query +=
+                    'VALUES (?, ?, ?, ?) ';                            
+                console.log('query:', query)
+                connection.query(query, [answers.first_name, answers.last_name, answers.role_id, answers.manager_id], (err, res) => {
+                    console.log('query:', query)
+                    if (err) throw err;
+                    console.table(res);
+                    connection.end();
+                });
+            })
+        }   else if (answers.action === 'REMOVE_EMPLOYEE') {
+                console.log(`you want to remove an Employees`);                        
+
+                inquirer.
+                prompt([
+                    {
+                    name: 'id',
+                    type: 'input',
+                    message: "Please enter the employees ID number",
+                },
+            ])
+                .then((answers) => {
+                    console.log(`we have reached the end`)
+                    
+                    let query = 
+                    'DELETE FROM employees WHERE employees.id = ?'                                                            
+                    console.log('query:', query)
+                    connection.query(query, [answers.id], (err, res) => {
+                        console.log('query:', query)
                         if (err) throw err;
-                        console.table(resM)
+                        console.table(res);
+                        connection.end();
                     });
-      
+                })
+        }   else if (answers.action === 'ADD_ROLE') {
+                    console.log(`you want to add a Role`);                        
+        
                     inquirer.
-                    prompt({
-                        name: 'manager',
+                    prompt([
+                        {
+                        name: 'title',
                         type: 'input',
-                        message: 'Please enter Manager ID',                       
-                         
-                    })
+                        message: "Please enter the role's title.",
+                    }, {
+                        name: 'salary',
+                        type: 'input',
+                        message: "Please enter the role's salary",
+                    }, {
+                        name: 'department',
+                        type: 'input',
+                        message: "Please enter the role's department id",
+                    }, 
+                ])
                     .then((answers) => {
                         console.log(`we have reached the end`)
-                        console.log(answers.manager)
+                        
                         let query = 
-                        'SELECT e.id, e.first_name, e.last_name, roles.title, departments.name, roles.salary, CONCAT(m.first_name, " ", m.last_name) '
+                        'INSERT INTO roles (title, salary, department_id) '
                         query +=
-                         'AS manager FROM employees e LEFT JOIN employees m ON m.id = e.manager_id JOIN roles ON e.role_id = roles.id JOIN departments ON departments.id = roles.department_id ';
-                        query +=
-                        'WHERE e.manager_id = ?;';
+                            'VALUES (?, ?, ?) ';                            
                         console.log('query:', query)
-                        connection.query(query, [answers.manager, answers.manager], (err, res) => {
+                        connection.query(query, [answers.title, answers.salary, answers.department], (err, res) => {
                             console.log('query:', query)
                             if (err) throw err;
                             console.table(res);
                             connection.end();
                         });
                     })
-                    } else if (answers.action === 'ADD_EMPLOYEE') {
-                        console.log(`you want to add an Employees`);                        
-          
+        }   else if (answers.action === 'REMOVE_ROLE') {
+                        console.log(`you want to remove a Role`);                        
+            
                         inquirer.
                         prompt([
                             {
-                            name: 'first_name',
+                            name: 'id',
                             type: 'input',
-                            message: "Please enter The Employee's first name",
-                        }, {
-                            name: 'last_name',
-                            type: 'input',
-                            message: "Please enter The Employee's first name",
-                        }, {
-                            name: 'role_id',
-                            type: 'input',
-                            message: "Please enter The Employee's Role ID",
-                        }, {
-                            name: 'manager_id',
-                            type: 'input',
-                            message: "Please enter The Employee's Manager ID. If the employee is a manager, enter 0",
-                        }
+                            message: "Please enter the Role's ID number",
+                        },
                     ])
                         .then((answers) => {
                             console.log(`we have reached the end`)
                             
                             let query = 
-                            'INSERT INTO employees (first_name, last_name, role_id, manager_id) '
-                            query +=
-                             'VALUES (?, ?, ?, ?) ';                            
+                            'DELETE FROM roles WHERE roles.id = ?'                                                            
                             console.log('query:', query)
-                            connection.query(query, [answers.first_name, answers.last_name, answers.role_id, answers.manager_id], (err, res) => {
+                            connection.query(query, [answers.id], (err, res) => {
                                 console.log('query:', query)
                                 if (err) throw err;
                                 console.table(res);
                                 connection.end();
                             });
                         })
-                        } else if (answers.action === 'REMOVE_EMPLOYEE') {
-                            console.log(`you want to remove an Employees`);                        
-              
+        }   else if (answers.action === 'ADD_DEPARTMENT') {
+                            console.log(`you want to add a Role`);                        
+                
                             inquirer.
                             prompt([
                                 {
-                                name: 'id',
+                                name: 'name',
                                 type: 'input',
-                                message: "Please enter the employees ID number",
-                            },
+                                message: "Please enter the Department's Name.",
+                            }, 
                         ])
                             .then((answers) => {
                                 console.log(`we have reached the end`)
                                 
                                 let query = 
-                                'DELETE FROM employees WHERE employees.id = ?'                                                            
+                                'INSERT INTO departments (name) '
+                                query +=
+                                    'VALUES (?) ';                            
                                 console.log('query:', query)
-                                connection.query(query, [answers.id], (err, res) => {
+                                connection.query(query, [answers.name], (err, res) => {
                                     console.log('query:', query)
                                     if (err) throw err;
                                     console.table(res);
                                     connection.end();
                                 });
                             })
-                            } else if (answers.action === 'ADD_ROLE') {
-                                console.log(`you want to add a Role`);                        
-                  
+        }   else if (answers.action === 'REMOVE_DEPARTMENT') {
+                                console.log(`you want to remove a Role`);                        
+                    
                                 inquirer.
                                 prompt([
                                     {
-                                    name: 'title',
+                                    name: 'id',
                                     type: 'input',
-                                    message: "Please enter the role's title.",
-                                }, {
-                                    name: 'salary',
-                                    type: 'input',
-                                    message: "Please enter the role's salary",
-                                }, {
-                                    name: 'department',
-                                    type: 'input',
-                                    message: "Please enter the role's department id",
-                                }, 
+                                    message: "Please enter the Departments's ID number",
+                                },
                             ])
                                 .then((answers) => {
                                     console.log(`we have reached the end`)
                                     
                                     let query = 
-                                    'INSERT INTO roles (title, salary, department_id) '
-                                    query +=
-                                     'VALUES (?, ?, ?) ';                            
+                                    'DELETE FROM departments WHERE departments.id = ?'                                                            
                                     console.log('query:', query)
-                                    connection.query(query, [answers.title, answers.salary, answers.department], (err, res) => {
+                                    connection.query(query, [answers.id], (err, res) => {
                                         console.log('query:', query)
                                         if (err) throw err;
                                         console.table(res);
                                         connection.end();
                                     });
                                 })
-                                } else if (answers.action === 'REMOVE_ROLE') {
-                                    console.log(`you want to remove a Role`);                        
-                      
-                                    inquirer.
-                                    prompt([
-                                        {
-                                        name: 'id',
-                                        type: 'input',
-                                        message: "Please enter the Role's ID number",
-                                    },
-                                ])
-                                    .then((answers) => {
-                                        console.log(`we have reached the end`)
-                                        
-                                        let query = 
-                                        'DELETE FROM roles WHERE roles.id = ?'                                                            
-                                        console.log('query:', query)
-                                        connection.query(query, [answers.id], (err, res) => {
-                                            console.log('query:', query)
-                                            if (err) throw err;
-                                            console.table(res);
-                                            connection.end();
-                                        });
-                                    })
-                                    } else if (answers.action === 'ADD_DEPARTMENT') {
-                                        console.log(`you want to add a Role`);                        
-                          
-                                        inquirer.
-                                        prompt([
-                                            {
-                                            name: 'name',
-                                            type: 'input',
-                                            message: "Please enter the Department's Name.",
-                                        }, 
-                                    ])
-                                        .then((answers) => {
-                                            console.log(`we have reached the end`)
-                                            
-                                            let query = 
-                                            'INSERT INTO departments (name) '
-                                            query +=
-                                             'VALUES (?) ';                            
-                                            console.log('query:', query)
-                                            connection.query(query, [answers.name], (err, res) => {
-                                                console.log('query:', query)
-                                                if (err) throw err;
-                                                console.table(res);
-                                                connection.end();
-                                            });
-                                        })
-                                        } else if (answers.action === 'REMOVE_DEPARTMENT') {
-                                            console.log(`you want to remove a Role`);                        
-                              
-                                            inquirer.
-                                            prompt([
-                                                {
-                                                name: 'id',
-                                                type: 'input',
-                                                message: "Please enter the Departments's ID number",
-                                            },
-                                        ])
-                                            .then((answers) => {
-                                                console.log(`we have reached the end`)
-                                                
-                                                let query = 
-                                                'DELETE FROM departments WHERE departments.id = ?'                                                            
-                                                console.log('query:', query)
-                                                connection.query(query, [answers.id], (err, res) => {
-                                                    console.log('query:', query)
-                                                    if (err) throw err;
-                                                    console.table(res);
-                                                    connection.end();
-                                                });
-                                            })
-                                            }
+        }   else if (answers.action === 'UPDATE_EMPLOYEE_ROLE') {
+            console.log(`you want to update and Employee's role`);                        
+
+            inquirer.
+            prompt([
+                {
+                name: 'id',
+                type: 'input',
+                message: "Please enter the Employee's ID number",
+            },{
+                name: 'newRole',
+                type: 'input',
+                message: "Please enter the New Role ID",
+            },
+        ])
+            .then((answers) => {
+                console.log(`we have reached the end`)
+                
+                let query = 
+                'UPDATE employees SET role_id = ? WHERE employees.id = ?'                                                            
+                console.log('query:', query)
+                connection.query(query, [answers.newRole, answers.id], (err, res) => {
+                    console.log('query:', query)
+                    if (err) throw err;
+                    console.table(res);
+                    connection.end();
+                });
+            })
+        }   else if (answers.action === 'UPDATE_EMPLOYEE_MANAGER') {
+            console.log(`you want to update and Employee's role`);                        
+
+            inquirer.
+            prompt([
+                {
+                name: 'id',
+                type: 'input',
+                message: "Please enter the Employee's ID number",
+            },{
+                name: 'newManager',
+                type: 'input',
+                message: "Please enter the New Manager ID",
+            },
+        ])
+            .then((answers) => {
+                console.log(`we have reached the end`)
+                
+                let query = 
+                'UPDATE employees SET manager_id = ? WHERE employees.id = ?'                                                            
+                console.log('query:', query)
+                connection.query(query, [answers.newManager, answers.id], (err, res) => {
+                    console.log('query:', query)
+                    if (err) throw err;
+                    console.table(res);
+                    start();
+                });
+            })
+        }   else if (answers.action === 'QUIT') {
+            console.log(`Have a Wonderful Day!`);                        
+            connection.end();
+           
+            
+            
+        }
 
 })
 }
