@@ -113,7 +113,13 @@ const connection = mysql.createConnection({
               });
         }   else if (answers.action === 'VIEW_ROLES') {
             console.log(`you want to see all Roles`);
-            connection.query('SELECT * FROM roles', (err, res) => {
+            let query = 
+            'SELECT roles.id, roles.title, roles.salary, departments.name AS department '
+            query +=
+             'FROM roles Inner JOIN departments ON roles.department_id = departments.id;';
+            console.log('query:', query)
+            
+            connection.query(query, (err, res) => {
                 if (err) throw err;
                 console.table(res);
                 connection.end();
