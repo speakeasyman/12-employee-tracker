@@ -157,8 +157,19 @@ const connection = mysql.createConnection({
                 .then((answers) => {
                     console.log(`we have reached the end`)
                     console.log(answers.department)
-                    let query = 'SELECT employees.first_name, employees.lastname, '
-                    connection.end();
+                    let query = 
+                    'SELECT e.id, e.first_name, e.last_name, roles.title, departments.name, roles.salary, CONCAT(m.first_name, " ", m.last_name) '
+                    query +=
+                     'AS manager FROM employees e LEFT JOIN employees m ON m.id = e.manager_id JOIN roles ON e.role_id = roles.id JOIN departments ON departments.id = roles.department_id ';
+                    query +=
+                    'WHERE roles.department_id = ?;';
+                    console.log('query:', query)
+                    connection.query(query, [answers.department, answers.department], (err, res) => {
+                        console.log('query:', query)
+                        if (err) throw err;
+                        console.table(res);
+                        connection.end();
+                    });
                 })
                 }
 })
