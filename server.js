@@ -257,7 +257,65 @@ const connection = mysql.createConnection({
                                     connection.end();
                                 });
                             })
-                            }
+                            } else if (answers.action === 'ADD_ROLE') {
+                                console.log(`you want to add a Role`);                        
+                  
+                                inquirer.
+                                prompt([
+                                    {
+                                    name: 'title',
+                                    type: 'input',
+                                    message: "Please enter the role's title.",
+                                }, {
+                                    name: 'salary',
+                                    type: 'input',
+                                    message: "Please enter the role's salary",
+                                }, {
+                                    name: 'department',
+                                    type: 'input',
+                                    message: "Please enter the role's department id",
+                                }, 
+                            ])
+                                .then((answers) => {
+                                    console.log(`we have reached the end`)
+                                    
+                                    let query = 
+                                    'INSERT INTO roles (title, salary, department_id) '
+                                    query +=
+                                     'VALUES (?, ?, ?) ';                            
+                                    console.log('query:', query)
+                                    connection.query(query, [answers.title, answers.salary, answers.department], (err, res) => {
+                                        console.log('query:', query)
+                                        if (err) throw err;
+                                        console.table(res);
+                                        connection.end();
+                                    });
+                                })
+                                } else if (answers.action === 'REMOVE_ROLE') {
+                                    console.log(`you want to remove a Role`);                        
+                      
+                                    inquirer.
+                                    prompt([
+                                        {
+                                        name: 'id',
+                                        type: 'input',
+                                        message: "Please enter the Role's ID number",
+                                    },
+                                ])
+                                    .then((answers) => {
+                                        console.log(`we have reached the end`)
+                                        
+                                        let query = 
+                                        'DELETE FROM roles WHERE roles.id = ?'                                                            
+                                        console.log('query:', query)
+                                        connection.query(query, [answers.id], (err, res) => {
+                                            console.log('query:', query)
+                                            if (err) throw err;
+                                            console.table(res);
+                                            connection.end();
+                                        });
+                                    })
+                                    }
 
 })
 }
