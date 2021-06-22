@@ -315,7 +315,57 @@ const connection = mysql.createConnection({
                                             connection.end();
                                         });
                                     })
-                                    }
+                                    } else if (answers.action === 'ADD_DEPARTMENT') {
+                                        console.log(`you want to add a Role`);                        
+                          
+                                        inquirer.
+                                        prompt([
+                                            {
+                                            name: 'name',
+                                            type: 'input',
+                                            message: "Please enter the Department's Name.",
+                                        }, 
+                                    ])
+                                        .then((answers) => {
+                                            console.log(`we have reached the end`)
+                                            
+                                            let query = 
+                                            'INSERT INTO departments (name) '
+                                            query +=
+                                             'VALUES (?) ';                            
+                                            console.log('query:', query)
+                                            connection.query(query, [answers.name], (err, res) => {
+                                                console.log('query:', query)
+                                                if (err) throw err;
+                                                console.table(res);
+                                                connection.end();
+                                            });
+                                        })
+                                        } else if (answers.action === 'REMOVE_DEPARTMENT') {
+                                            console.log(`you want to remove a Role`);                        
+                              
+                                            inquirer.
+                                            prompt([
+                                                {
+                                                name: 'id',
+                                                type: 'input',
+                                                message: "Please enter the Departments's ID number",
+                                            },
+                                        ])
+                                            .then((answers) => {
+                                                console.log(`we have reached the end`)
+                                                
+                                                let query = 
+                                                'DELETE FROM departments WHERE departments.id = ?'                                                            
+                                                console.log('query:', query)
+                                                connection.query(query, [answers.id], (err, res) => {
+                                                    console.log('query:', query)
+                                                    if (err) throw err;
+                                                    console.table(res);
+                                                    connection.end();
+                                                });
+                                            })
+                                            }
 
 })
 }
