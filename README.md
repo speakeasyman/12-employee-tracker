@@ -12,7 +12,7 @@ The Week 12 homework
     This was node.js, and using mySQL. There is also npm: express, and console.table.
 
 4.0 Launch:
-    The repo is located at: https://github.com/speakeasyman/12-employee-tracker
+    The repo is located at: https://github.com/speakeasyman/12-employee-tracker <br>
     The video can be found here: https://youtu.be/eMmruiZvL1c
 
 5.0 My Goals: 
