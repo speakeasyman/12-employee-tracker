@@ -1,7 +1,6 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
-// const prompts = require('./assets/prompts')
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -110,7 +109,7 @@ const connection = mysql.createConnection({
               connection.query(query, (err, res) => {
                   if (err) throw err;
                   console.table(res);
-                  connection.end();
+                  start();
               });
         }   else if (answers.action === 'VIEW_ROLES') {
             console.log(`you want to see all Roles`);
@@ -123,14 +122,14 @@ const connection = mysql.createConnection({
             connection.query(query, (err, res) => {
                 if (err) throw err;
                 console.table(res);
-                connection.end();
+                start();
             });
         }   else if (answers.action === 'VIEW_DEPARTMENTS') {
                 console.log(`you want to see all Departments`);
                 connection.query('SELECT * FROM departments', (err, res) => {
                     if (err) throw err;
                     console.table(res);
-                    connection.end();
+                    start();
                 });
         }   else if (answers.action === 'VIEW_EMPLOYEES_BY_DEPARTMENT') {
                 console.log(`you want to see Employees by department`);
@@ -146,21 +145,17 @@ const connection = mysql.createConnection({
                     message: 'enter the department ID number',
                     
                 })
-                .then((answers) => {
-                    console.log(`we have reached the end`)
-                    console.log(answers.department)
+                .then((answers) => {                    
                     let query = 
                     'SELECT e.id, e.first_name, e.last_name, roles.title, departments.name, roles.salary, CONCAT(m.first_name, " ", m.last_name) '
                     query +=
                      'AS manager FROM employees e LEFT JOIN employees m ON m.id = e.manager_id JOIN roles ON e.role_id = roles.id JOIN departments ON departments.id = roles.department_id ';
                     query +=
-                    'WHERE roles.department_id = ?;';
-                    console.log('query:', query)
-                    connection.query(query, [answers.department, answers.department], (err, res) => {
-                        console.log('query:', query)
+                    'WHERE roles.department_id = ?;';                    
+                    connection.query(query, [answers.department, answers.department], (err, res) => {                        
                         if (err) throw err;
                         console.table(res);
-                        connection.end();
+                        start();
                     });
                 })
         }   else if (answers.action === 'VIEW_EMPLOYEES_BY_MANAGER') {
@@ -178,25 +173,21 @@ const connection = mysql.createConnection({
                 message: 'Please enter Manager ID',                       
                     
             })
-            .then((answers) => {
-                console.log(`we have reached the end`)
-                console.log(answers.manager)
+            .then((answers) => {                
                 let query = 
                 'SELECT e.id, e.first_name, e.last_name, roles.title, departments.name, roles.salary, CONCAT(m.first_name, " ", m.last_name) '
                 query +=
                     'AS manager FROM employees e LEFT JOIN employees m ON m.id = e.manager_id JOIN roles ON e.role_id = roles.id JOIN departments ON departments.id = roles.department_id ';
                 query +=
-                'WHERE e.manager_id = ?;';
-                console.log('query:', query)
-                connection.query(query, [answers.manager, answers.manager], (err, res) => {
-                    console.log('query:', query)
+                'WHERE e.manager_id = ?;';                
+                connection.query(query, [answers.manager, answers.manager], (err, res) => {                   
                     if (err) throw err;
                     console.table(res);
-                    connection.end();
+                    start();
                 });
             })
         }   else if (answers.action === 'ADD_EMPLOYEE') {
-            console.log(`you want to add an Employees`);                        
+            console.log(`you want to add an Employee`);                        
 
             inquirer.
             prompt([
@@ -218,19 +209,16 @@ const connection = mysql.createConnection({
                 message: "Please enter The Employee's Manager ID. If the employee is a manager, enter 0",
             }
         ])
-            .then((answers) => {
-                console.log(`we have reached the end`)
-                
+            .then((answers) => {                
                 let query = 
                 'INSERT INTO employees (first_name, last_name, role_id, manager_id) '
                 query +=
-                    'VALUES (?, ?, ?, ?) ';                            
-                console.log('query:', query)
+                    'VALUES (?, ?, ?, ?) ';
                 connection.query(query, [answers.first_name, answers.last_name, answers.role_id, answers.manager_id], (err, res) => {
                     console.log('query:', query)
                     if (err) throw err;
                     console.table(res);
-                    connection.end();
+                    start();
                 });
             })
         }   else if (answers.action === 'REMOVE_EMPLOYEE') {
@@ -245,16 +233,13 @@ const connection = mysql.createConnection({
                 },
             ])
                 .then((answers) => {
-                    console.log(`we have reached the end`)
-                    
                     let query = 
-                    'DELETE FROM employees WHERE employees.id = ?'                                                            
-                    console.log('query:', query)
+                    'DELETE FROM employees WHERE employees.id = ?' 
                     connection.query(query, [answers.id], (err, res) => {
                         console.log('query:', query)
                         if (err) throw err;
                         console.table(res);
-                        connection.end();
+                        start();
                     });
                 })
         }   else if (answers.action === 'ADD_ROLE') {
@@ -277,23 +262,18 @@ const connection = mysql.createConnection({
                     }, 
                 ])
                     .then((answers) => {
-                        console.log(`we have reached the end`)
-                        
                         let query = 
                         'INSERT INTO roles (title, salary, department_id) '
                         query +=
-                            'VALUES (?, ?, ?) ';                            
-                        console.log('query:', query)
+                            'VALUES (?, ?, ?) '; 
                         connection.query(query, [answers.title, answers.salary, answers.department], (err, res) => {
-                            console.log('query:', query)
                             if (err) throw err;
                             console.table(res);
-                            connection.end();
+                            start();
                         });
                     })
         }   else if (answers.action === 'REMOVE_ROLE') {
-                        console.log(`you want to remove a Role`);                        
-            
+                        console.log(`you want to remove a Role`);
                         inquirer.
                         prompt([
                             {
@@ -302,17 +282,13 @@ const connection = mysql.createConnection({
                             message: "Please enter the Role's ID number",
                         },
                     ])
-                        .then((answers) => {
-                            console.log(`we have reached the end`)
-                            
+                        .then((answers) => {           
                             let query = 
-                            'DELETE FROM roles WHERE roles.id = ?'                                                            
-                            console.log('query:', query)
+                            'DELETE FROM roles WHERE roles.id = ?'
                             connection.query(query, [answers.id], (err, res) => {
-                                console.log('query:', query)
                                 if (err) throw err;
                                 console.table(res);
-                                connection.end();
+                                start();
                             });
                         })
         }   else if (answers.action === 'ADD_DEPARTMENT') {
@@ -327,18 +303,14 @@ const connection = mysql.createConnection({
                             }, 
                         ])
                             .then((answers) => {
-                                console.log(`we have reached the end`)
-                                
                                 let query = 
                                 'INSERT INTO departments (name) '
                                 query +=
-                                    'VALUES (?) ';                            
-                                console.log('query:', query)
+                                    'VALUES (?) '; 
                                 connection.query(query, [answers.name], (err, res) => {
-                                    console.log('query:', query)
                                     if (err) throw err;
                                     console.table(res);
-                                    connection.end();
+                                    start();
                                 });
                             })
         }   else if (answers.action === 'REMOVE_DEPARTMENT') {
@@ -353,21 +325,16 @@ const connection = mysql.createConnection({
                                 },
                             ])
                                 .then((answers) => {
-                                    console.log(`we have reached the end`)
-                                    
                                     let query = 
-                                    'DELETE FROM departments WHERE departments.id = ?'                                                            
-                                    console.log('query:', query)
+                                    'DELETE FROM departments WHERE departments.id = ?'
                                     connection.query(query, [answers.id], (err, res) => {
-                                        console.log('query:', query)
                                         if (err) throw err;
                                         console.table(res);
-                                        connection.end();
+                                        start();
                                     });
                                 })
         }   else if (answers.action === 'UPDATE_EMPLOYEE_ROLE') {
-            console.log(`you want to update and Employee's role`);                        
-
+            console.log(`you want to update and Employee's role`); 
             inquirer.
             prompt([
                 {
@@ -381,16 +348,12 @@ const connection = mysql.createConnection({
             },
         ])
             .then((answers) => {
-                console.log(`we have reached the end`)
-                
                 let query = 
-                'UPDATE employees SET role_id = ? WHERE employees.id = ?'                                                            
-                console.log('query:', query)
+                'UPDATE employees SET role_id = ? WHERE employees.id = ?' 
                 connection.query(query, [answers.newRole, answers.id], (err, res) => {
-                    console.log('query:', query)
                     if (err) throw err;
                     console.table(res);
-                    connection.end();
+                    start();
                 });
             })
         }   else if (answers.action === 'UPDATE_EMPLOYEE_MANAGER') {
@@ -409,13 +372,9 @@ const connection = mysql.createConnection({
             },
         ])
             .then((answers) => {
-                console.log(`we have reached the end`)
-                
                 let query = 
-                'UPDATE employees SET manager_id = ? WHERE employees.id = ?'                                                            
-                console.log('query:', query)
+                'UPDATE employees SET manager_id = ? WHERE employees.id = ?'  
                 connection.query(query, [answers.newManager, answers.id], (err, res) => {
-                    console.log('query:', query)
                     if (err) throw err;
                     console.table(res);
                     start();
@@ -424,9 +383,6 @@ const connection = mysql.createConnection({
         }   else if (answers.action === 'QUIT') {
             console.log(`Have a Wonderful Day!`);                        
             connection.end();
-           
-            
-            
         }
 
 })
