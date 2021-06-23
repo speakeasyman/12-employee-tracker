@@ -19,17 +19,17 @@ const connection = mysql.createConnection({
   connection.connect((err) => {
     if (err) throw err;
     start();
-    // generateManagers();
 });
 
   exports.connection = connection
-
+// the start function, originally in my head I was hoping to have it a lot more modular, but I ran
+// I didn't have as much time this week due to a trip.
   const start = () => {
       startPrompt();
   };
-
-  const startPrompt = () => {
-    
+// These are the prompts. It could definitely be more modular, that would be a later day thing.
+// When they select which choice prompt it will carry down to the query search.
+  const startPrompt = () => {    
     inquirer
       .prompt([
           {
@@ -99,7 +99,11 @@ const connection = mysql.createConnection({
       .then((answers) => {
           console.log(answers)
           if (answers.action === 'VIEW_EMPLOYEES') {
-              console.log(`you want to see all employees`);
+              // So, the console.logs were just there as a placeholder as I built the prompts
+              // but then I kind of liked the feed back, so I kept them.
+              // I did the query and the query += as a way to keep the lines from being super long
+              // I saw someone else do it online.
+              console.log(`You want to see all employees`);
               let query = 
               'SELECT e.id, e.first_name, e.last_name, roles.title, departments.name, roles.salary, CONCAT(m.first_name, " ", m.last_name)'
               query +=
@@ -112,7 +116,7 @@ const connection = mysql.createConnection({
                   start();
               });
         }   else if (answers.action === 'VIEW_ROLES') {
-            console.log(`you want to see all Roles`);
+            console.log(`You want to see all Roles`);
             let query = 
             'SELECT roles.id, roles.title, roles.salary, departments.name AS department '
             query +=
@@ -125,17 +129,21 @@ const connection = mysql.createConnection({
                 start();
             });
         }   else if (answers.action === 'VIEW_DEPARTMENTS') {
-                console.log(`you want to see all Departments`);
+                console.log(`You want to see all Departments`);
                 connection.query('SELECT * FROM departments', (err, res) => {
                     if (err) throw err;
                     console.table(res);
                     start();
                 });
         }   else if (answers.action === 'VIEW_EMPLOYEES_BY_DEPARTMENT') {
-                console.log(`you want to see Employees by department`);
+                console.log(`You want to see Employees by department`);
                 let deptQuery = 'SELECT * FROM departments'
                 connection.query(deptQuery, (err, resD) => {
                     if (err) throw err;
+                    //Ok, this is neat. I kept forgetting what my department or manager IDs are
+                    //So I print a table as a reference so I know which id to search by.
+                    //It should be possible to have a function return and array, so the choices could just auto-
+                    //populate from a list type input, but I couldn't figure it out in the time I had.
                     console.table(resD)
                 });
                 inquirer.
@@ -163,6 +171,7 @@ const connection = mysql.createConnection({
             let managerQuery = 'SELECT CONCAT(employees.first_name, " ", employees.last_name) AS Name, employees.id AS Manager from employees WHERE manager_id = 0'
             connection.query(managerQuery, (err, resM) => {
                 if (err) throw err;
+                //the manager table.
                 console.table(resM)
             });
 
@@ -187,8 +196,7 @@ const connection = mysql.createConnection({
                 });
             })
         }   else if (answers.action === 'ADD_EMPLOYEE') {
-            console.log(`you want to add an Employee`);                        
-
+            console.log(`you want to add an Employee`); 
             inquirer.
             prompt([
                 {
@@ -273,7 +281,7 @@ const connection = mysql.createConnection({
                         });
                     })
         }   else if (answers.action === 'REMOVE_ROLE') {
-                        console.log(`you want to remove a Role`);
+                        console.log(`You want to remove a Role`);
                         inquirer.
                         prompt([
                             {
@@ -387,26 +395,3 @@ const connection = mysql.createConnection({
 
 })
 }
-
-
-//   generateManagers = () => {
-//       let query = 'SELECT CONCAT(employees.first_name, " ", employees.last_name) AS Name, employees.id AS Manager from employees WHERE manager_id = 0'
-//       connection.query(query,(err, res) => {
-//         console.log('query:', query)
-//         if (err) throw err;
-//       console.log(res[0].Manager)
-//       console.log(res[0].Name)
-//       const choices = res.map(function (obj){
-//           `{
-//               name: ${obj.Name},
-//               value: ${obj.Manager}
-//           }`
-
-//         })
-//         console.log(`here's choices!! ${choices}`)
-        
-        
-        
-//         connection.end();
-//     });
-//   }
