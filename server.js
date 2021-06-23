@@ -107,8 +107,6 @@ const startPrompt = () => {
           'SELECT e.id, e.first_name, e.last_name, roles.title, departments.name, roles.salary, CONCAT(m.first_name, " ", m.last_name)';
         query +=
           "AS manager FROM employees e LEFT JOIN employees m ON m.id = e.manager_id JOIN roles ON e.role_id = roles.id JOIN departments ON departments.id = roles.department_id;";
-        console.log("query:", query);
-
         connection.query(query, (err, res) => {
           if (err) throw err;
           console.table(res);
@@ -119,9 +117,7 @@ const startPrompt = () => {
         let query =
           "SELECT roles.id, roles.title, roles.salary, departments.name AS department ";
         query +=
-          "FROM roles Inner JOIN departments ON roles.department_id = departments.id;";
-        console.log("query:", query);
-
+          "FROM roles Inner JOIN departments ON roles.department_id = departments.id;";        
         connection.query(query, (err, res) => {
           if (err) throw err;
           console.table(res);
@@ -168,7 +164,7 @@ const startPrompt = () => {
             );
           });
       } else if (answers.action === "VIEW_EMPLOYEES_BY_MANAGER") {
-        console.log(`you want to see Employees by Manager`);
+        console.log(`You want to see Employees by Manager`);
         let managerQuery =
           'SELECT CONCAT(employees.first_name, " ", employees.last_name) AS Name, employees.id AS Manager from employees WHERE manager_id = 0';
         connection.query(managerQuery, (err, resM) => {
@@ -199,7 +195,7 @@ const startPrompt = () => {
             );
           });
       } else if (answers.action === "ADD_EMPLOYEE") {
-        console.log(`you want to add an Employee`);
+        console.log(`You want to add an Employee`);
         inquirer
           .prompt([
             {
@@ -237,7 +233,6 @@ const startPrompt = () => {
                 answers.manager_id,
               ],
               (err, res) => {
-                console.log("query:", query);
                 if (err) throw err;
                 console.table(res);
                 start();
@@ -245,7 +240,7 @@ const startPrompt = () => {
             );
           });
       } else if (answers.action === "REMOVE_EMPLOYEE") {
-        console.log(`you want to remove an Employees`);
+        console.log(`You want to remove an Employees`);
 
         inquirer
           .prompt([
@@ -258,14 +253,13 @@ const startPrompt = () => {
           .then((answers) => {
             let query = "DELETE FROM employees WHERE employees.id = ?";
             connection.query(query, [answers.id], (err, res) => {
-              console.log("query:", query);
               if (err) throw err;
               console.table(res);
               start();
             });
           });
       } else if (answers.action === "ADD_ROLE") {
-        console.log(`you want to add a Role`);
+        console.log(`You want to add a Role`);
 
         inquirer
           .prompt([
@@ -317,7 +311,7 @@ const startPrompt = () => {
             });
           });
       } else if (answers.action === "ADD_DEPARTMENT") {
-        console.log(`you want to add a Role`);
+        console.log(`You want to add a Role`);
 
         inquirer
           .prompt([
@@ -337,7 +331,7 @@ const startPrompt = () => {
             });
           });
       } else if (answers.action === "REMOVE_DEPARTMENT") {
-        console.log(`you want to remove a Role`);
+        console.log(`You want to remove a Role`);
 
         inquirer
           .prompt([
@@ -356,7 +350,7 @@ const startPrompt = () => {
             });
           });
       } else if (answers.action === "UPDATE_EMPLOYEE_ROLE") {
-        console.log(`you want to update and Employee's role`);
+        console.log(`You want to update and Employee's role`);
         inquirer
           .prompt([
             {
@@ -384,7 +378,7 @@ const startPrompt = () => {
             );
           });
       } else if (answers.action === "UPDATE_EMPLOYEE_MANAGER") {
-        console.log(`you want to update and Employee's role`);
+        console.log(`You want to update and Employee's role`);
 
         inquirer
           .prompt([
